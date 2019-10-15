@@ -14,10 +14,9 @@ The original implementation for this Machine Learning model can be [found here](
 ## Example
 
 To use this package you need a sparse co-occurence matrix.
-This matrix is represented by nested dictionaries that use ints as keys
-with a 0-index.
+This matrix is represented by nested dictionaries that use ints as keys with a 0-index.
 
-For instance below we have a corpus of 3 indices. Below 0 co-occurs with 2, 3.5 times:
+For example below we have a corpus of 3 indices. Below 0 co-occurs with 2, 3.5 times:
 
 ```python
 import glove
@@ -49,6 +48,8 @@ The trained embeddings are now present under `model.W`.
 ## Usage
 
 The model is controlled by setting several hyperpameters.
+
+`pydoc glove`
 
 ### Glove.__init__()
 

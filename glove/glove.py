@@ -3,15 +3,34 @@ from multiprocessing import Queue, Lock
 import threading
 import numpy as np
 import pyximport
+from typing import Dict
 pyximport.install(setup_args={"include_dirs": np.get_include()})
 
 from .glove_inner import train_glove
 
 class Glove(object):
-    def __init__(self, cooccurence, alpha=0.75, x_max=100.0, d=50, seed=1234):
+    def __init__(self, cooccurence :Dict[int,Dict[int,float]], alpha :float=0.75, x_max :float =100.0, d :int =50, seed :int=1234):
         """
-        Glove model for obtaining dense embeddings from a
-        co-occurence (sparse) matrix.
+        Glove model for obtaining dense embeddings from a co-occurence (sparse) matrix.
+
+        Parameters:
+        cooccurence : the co-occurence matrix aka examples in this module
+        alpha : (default 0.75) hyperparameter for controlling the exponent for normalized co-occurence counts.
+        x_max : (default 100.0) hyperparameter for controlling smoothing for common items in co-occurence matrix.
+        d : (default 50) how many embedding dimensions for learnt vectors
+        seed : (default 1234) the random seed
+
+        Internals:
+        W :numpy.ndarray
+        ContextW: numpy.ndarray
+        b: numpy.ndarray
+        ContextB: numpy.ndarray
+        gradsqW: numpy.ndarray
+        gradsqContextW: numpy.ndarray
+        gradsqb: numpy.ndarray
+        gradsqContextB: numpy.ndarray
+
+        The trained embeddings are built in `self.W`.
         """
         self.alpha           = alpha
         self.x_max           = x_max
@@ -28,7 +47,14 @@ class Glove(object):
         self.gradsqb         = np.ones_like(self.b, dtype=np.float64)
         self.gradsqContextB  = np.ones_like(self.ContextB, dtype=np.float64)
 
-    def train(self, step_size=0.05, workers = 9, batch_size=50, verbose=False):
+    def train(self, step_size:float=0.05, workers:int= 9, batch_size:int=50, verbose:bool=False):
+        """
+        step_size:float the learning rate for the model
+        workers:int number of worker threads used for training
+        batch_size:int how many examples should each thread receive (controls the size of the job queue)
+
+        returns:float  average error per example 
+        """
         jobs = Queue(maxsize=2 * workers)
         lock = threading.Lock()  # for shared state (=number of words trained so far, log reports...)
         total_error = [0.0]
@@ -80,6 +106,7 @@ class Glove(object):
                     num_examples += len(batch)
                     batch = []
                     batch_length = 0
+        # Put the last ragged batch
         if len(batch) > 0:
             jobs.put(
                 (

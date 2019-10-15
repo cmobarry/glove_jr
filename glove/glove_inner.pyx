@@ -1,8 +1,12 @@
 #!/usr/bin/env cython
+# cython: language_level=3
 # cython: boundscheck=False
 # cython: wraparound=False
 # cython: cdivision=True
+# cython: annotate=True
 # coding: utf-8
+
+DEF NPY_NO_DEPRECATED_API = "NPY_1_7_API_VERSION"
 
 import cython
 import numpy as np
