@@ -6,7 +6,6 @@
 # cython: annotate=True
 # coding: utf-8
 
-DEF NPY_NO_DEPRECATED_API = "NPY_1_7_API_VERSION"
 
 import cython
 import numpy as np
@@ -20,7 +19,7 @@ ctypedef np.uint32_t  INT_t
 cdef void train_glove_thread(
         REAL_t * W,       REAL_t * ContextW,
         REAL_t * gradsqW, REAL_t * gradsqContextW,
-        REAL_t * bias,       REAL_t * ContextB,
+        REAL_t * bias,    REAL_t * ContextB,
         REAL_t * gradsqb, REAL_t * gradsqContextB,
         REAL_t * error,
         INT_t * job_key, INT_t * job_subkey, REAL_t * job_target,
@@ -62,6 +61,10 @@ cdef void train_glove_thread(
         gradsqContextB[job_subkey[example_idx]] += fdiff
 
 def train_glove(model, jobs, float _step_size, _error):
+    # Why is "jobs" called "jobs"?
+    # It is the observations which is equivalent to the three dense vectors
+    # (job_key, job_subkey, job_target) == (jobs0, jobs1, jobs2).
+    # Basicly a dataframe.
     cdef REAL_t *W              = <REAL_t *>(np.PyArray_DATA(model.W))
     cdef REAL_t *ContextW       = <REAL_t *>(np.PyArray_DATA(model.ContextW))
     cdef REAL_t *gradsqW        = <REAL_t *>(np.PyArray_DATA(model.gradsqW))

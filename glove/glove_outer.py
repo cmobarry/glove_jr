@@ -9,7 +9,7 @@ pyximport.install(setup_args={"include_dirs": np.get_include()})
 from .glove_inner import train_glove
 
 class Glove(object):
-    def __init__(self, cooccurence :Dict[int,Dict[int,float]], alpha :float=0.75, x_max :float =100.0, d :int =50, seed :int=1234):
+    def __init__(self, cooccurence:Dict[int,Dict[int,float]], alpha:float=0.75, x_max:float=100.0, d:int=50, seed:int=1234):
         """
         Glove model for obtaining dense embeddings from a co-occurence (sparse) matrix.
 
@@ -47,7 +47,7 @@ class Glove(object):
         self.gradsqb         = np.ones_like(self.b, dtype=np.float64)
         self.gradsqContextB  = np.ones_like(self.ContextB, dtype=np.float64)
 
-    def train(self, step_size:float=0.05, workers:int= 9, batch_size:int=50, verbose:bool=False):
+    def train(self, step_size:float=0.05, workers:int=9, batch_size:int=50, verbose:bool=False) -> float:
         """
         step_size:float the learning rate for the model
         workers:int number of worker threads used for training
